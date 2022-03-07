@@ -240,6 +240,7 @@ def show_class():
     exit()    
 
 def main():
+    os.system('clear')
     generate_new_percentile_tables = False
 
     if len(sys.argv) == 2 and sys.argv[1] == 'gen':
@@ -257,11 +258,18 @@ def main():
     main_menu = TerminalMenu(['Start', "Exit"], title = "-------------------")
     main_menu_index = None
 
+    first_run = True
+
     while main_menu_index != 1:
         #os.system('clear')
-        main_menu_index = main_menu.show()
+        if first_run:
+            first_run = False
+            main_menu_index = 0
+        else:
+            main_menu_index = main_menu.show()
         
         if main_menu_index == 0:
+            os.system('clear')
             # weight_classes = ['59','66','74','83','93','105','120','120+','----','43','47','52','57','63','72','84','84+', '-----',
             # '52','56','60','67.5','75','82.5','90','100','110','125','140','140+', '-----',
             # '44','48','52','56','60','67.5','75','82.5','90','90+']
@@ -299,7 +307,6 @@ def main():
                 weight_class_full = weight_class_dict[weight_class]
             else:
                 weight_class_full = weight_class_dict_untested[weight_class]
-
 
             print(weight_class)
             print(weight_class_full)
