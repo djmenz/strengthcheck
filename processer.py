@@ -8,10 +8,8 @@ import sys
 from simple_term_menu import TerminalMenu, main
 #from dask import dataframe as df1
   
-# time taken to read data
-
 generate_new_percentile_tables = False
-#generate_untested = True
+generate_full_details = False
 
 weight_class_dict = {
     '53_M' : {"WeightClass": "53", "Sex" : 'M', "Equip": "raw", "Tested": "tested", "WeightMin": 0.0, "WeightMax": 53.0},
@@ -146,9 +144,13 @@ def generate_tables_per_file(csv_file, weight_classes):
             for percentile in percentiles:
                 location = int(entry_size * (1 - (percentile / 100)))
                 entry = (sorted_df.iloc[location,:])
-                print(f"{percentile} - {entry[filter_lift]} - {entry['Name']} - {entry_size - int(percentile/100*entry_size)}")
-                res.append([percentile, entry[filter_lift], entry['Name'], entry_size - int(percentile/100*entry_size)])
-                #res.append([percentile, entry[filter_lift]])
+                #print(f"{percentile} - {entry[filter_lift]} - {entry['Name']} - {entry_size - int(percentile/100*entry_size)}")
+                
+                # full detail or shortened details
+                if generate_full_details:
+                    res.append([percentile, entry[filter_lift], entry['Name'], entry_size - int(percentile/100*entry_size)])
+                else:
+                    res.append([percentile, entry[filter_lift]])
 
 
             class_percentiles[lift_label_lookup[filter_lift]] = res
@@ -206,12 +208,45 @@ def calc_percentile(weight_class_full_data, filter_lift_input, target_lift, ):
             print(f"{pair[0]}% percentile for {filter_lift_input} for {weight_class_full_data['WeightClass']}kg class")
             break
 
+def show_class():
+    weight_classes_all = list(weight_class_dict.keys()) + list(weight_class_dict_untested.keys())
+    gender_menu = TerminalMenu(['Male', "Female"])
+    gender_selection_index = gender_menu.show()
+    gender_selection = ['M','F'][gender_selection_index]
+
+    weight_classes = [e for e in weight_classes_all if gender_selection in e]
+    menu_weight_class = TerminalMenu(weight_classes, title = "Choose Weight Class")
+    weight_class_selection = menu_weight_class.show()
+    weight_class = weight_classes[weight_class_selection]
+
+    try:
+        weight_class_full_data = weight_class_dict_untested[weight_class]
+    except:
+        weight_class_full_data = weight_class_dict[weight_class]
+
+    
+    with open('all_data') as file:
+        all_percentile_data = json.load(file)
+
+    class_dict_key = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] + weight_class_full_data['Equip']
+
+    for i in range(0,100):
+        temp = ""
+        for k,v in (all_percentile_data[class_dict_key]).items():
+            #breakpoint()
+            temp +=f"{k} {v[i][1]:6} | " 
+        print(f"{100-i:3} {temp}")
+
+    exit()    
 
 def main():
     generate_new_percentile_tables = False
 
     if len(sys.argv) == 2 and sys.argv[1] == 'gen':
         generate_new_percentile_tables = True
+
+    if len(sys.argv) == 2 and sys.argv[1] == 'class':
+        show_class()  
 
     if generate_new_percentile_tables:
         s_time = time.time()
@@ -231,8 +266,7 @@ def main():
             # '52','56','60','67.5','75','82.5','90','100','110','125','140','140+', '-----',
             # '44','48','52','56','60','67.5','75','82.5','90','90+']
 
-            #weight_classes = list(weight_class_dict.keys())
-            weight_classes_all = list(weight_class_dict.keys()) + list(weight_class_dict_untested.keys())
+            # weight_classes_all = list(weight_class_dict.keys()) + list(weight_class_dict_untested.keys())
             
             gender_menu = TerminalMenu(['Male', "Female"])
             gender_selection_index = gender_menu.show()
@@ -242,7 +276,12 @@ def main():
             tested_selection_index = tested_menu.show()
             tested_selection = ['tested','untested'][tested_selection_index]
 
-            weight_classes = [e for e in weight_classes_all if gender_selection in e]
+            if tested_selection == 'tested':
+                weight_classes_selected =  list(weight_class_dict.keys())
+            else:
+                weight_classes_selected =  list(weight_class_dict_untested.keys())
+                
+            weight_classes = [e for e in weight_classes_selected if gender_selection in e]
 
             menu_weight_class = TerminalMenu(weight_classes, title = "Choose Weight Class")
             weight_class_selection = menu_weight_class.show()
@@ -256,10 +295,10 @@ def main():
 
             weight_class = weight_classes[weight_class_selection]
             
-            try:
-                weight_class_full = weight_class_dict_untested[weight_class]
-            except:
+            if tested_selection == 'tested':
                 weight_class_full = weight_class_dict[weight_class]
+            else:
+                weight_class_full = weight_class_dict_untested[weight_class]
 
 
             print(weight_class)
