@@ -9,7 +9,7 @@ from simple_term_menu import TerminalMenu, main
 #from dask import dataframe as df1
   
 generate_new_percentile_tables = False
-generate_full_details = False
+generate_full_details = True
 
 weight_class_dict = {
     '53_M' : {"WeightClass": "53", "Sex" : 'M', "Equip": "raw", "Tested": "tested", "WeightMin": 0.0, "WeightMax": 53.0},
@@ -81,8 +81,8 @@ lift_label_lookup = {
             }
 
 def generate_tables():
-    tested_data_csv = "openipf-2022-02-22-8fc7c9ba.csv"
-    untested_data_csv = "openpowerlifting-2022-02-22-8fc7c9ba.csv"    
+    tested_data_csv = "openipf-2022-03-22-4758fd85.csv"
+    untested_data_csv = "openpowerlifting-2022-03-22-4758fd85.csv"    
     generate_tables_per_file(tested_data_csv, weight_class_dict)
     generate_tables_per_file(untested_data_csv, weight_class_dict_untested)
 
@@ -122,7 +122,7 @@ def generate_tables_per_file(csv_file, weight_classes):
                         & (df['Equipment'] == 'Raw')  
                         & (df['Sex'] == weight_class_full_data['Sex'])
                         & (df['Event'].isin(filter_event))
-                        & (~df['Division'].isin(youth_divisions))    
+                        #& (~df['Division'].isin(youth_divisions))    
                         & (np.isnan(df[filter_lift]) == False)]
 
             #print(len(filtered_df))
@@ -157,10 +157,10 @@ def generate_tables_per_file(csv_file, weight_classes):
             print()
 
         # Output to file
-        output_file_name = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip'] \
-                         + '_percentiles.json'
-        with open('data/' + output_file_name, "w") as outfile:
-            outfile.write(json.dumps(class_percentiles))
+        # output_file_name = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip'] \
+        #                  + '_percentiles.json'
+        # with open('data/' + output_file_name, "w") as outfile:
+        #     outfile.write(json.dumps(class_percentiles))
 
         # output to one file (read in current and then add to dict and append to file)
         with open('all_data') as file:
@@ -188,8 +188,8 @@ def calc_percentile(weight_class_full_data, filter_lift_input, target_lift, ):
 
     class_dict_key = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] + weight_class_full_data['Equip']
     
-    with open('data/' + input_file_name) as file:
-        percentile_data = json.load(file)
+    # with open('data/' + input_file_name) as file:
+    #     percentile_data = json.load(file)
 
     with open('all_data') as file:
             all_percentile_data = json.load(file)
@@ -199,7 +199,7 @@ def calc_percentile(weight_class_full_data, filter_lift_input, target_lift, ):
 
     print('------------')
 
-    for pair in percentile_data[lift_label_lookup[filter_lift_input]]:
+    for pair in all_percentile_data[class_dict_key][lift_label_lookup[filter_lift_input]]:
         print(pair)
         if pair[1] > target_lift:
             pass
@@ -235,7 +235,7 @@ def show_class():
         for k,v in (all_percentile_data[class_dict_key]).items():
             #breakpoint()
             temp +=f"{k} {v[i][1]:6} | " 
-        print(f"{100-i:3} {temp}")
+        print(f"{100-i:3}%  {temp}")
 
     exit()    
 
