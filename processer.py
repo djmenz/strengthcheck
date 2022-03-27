@@ -9,51 +9,77 @@ from simple_term_menu import TerminalMenu, main
 #from dask import dataframe as df1
   
 generate_new_percentile_tables = False
-generate_full_details = True
+generate_full_details = False
 
 weight_class_dict = {
-    '53_M' : {"WeightClass": "53", "Sex" : 'M', "Equip": "raw", "Tested": "tested", "WeightMin": 0.0, "WeightMax": 53.0},
-    '59_M' : {"WeightClass": "59", "Sex" : 'M', "Equip": "raw", "Tested": "tested",  "WeightMin": 53.0, "WeightMax": 59.0},
-    '66_M' : {"WeightClass": "66", "Sex" : 'M', "Equip": "raw", "Tested": "tested",  "WeightMin": 59.0, "WeightMax": 66.0},
-    '74_M' : {"WeightClass": "74", "Sex" : 'M', "Equip": "raw", "Tested": "tested",  "WeightMin": 66.0, "WeightMax": 74.0},
-    '83_M' : {"WeightClass": "83", "Sex" : 'M', "Equip": "raw", "Tested": "tested",  "WeightMin": 74.0, "WeightMax": 83.0},
-    '93_M' : {"WeightClass": "93", "Sex" : 'M', "Equip": "raw", "Tested": "tested",  "WeightMin": 83.0, "WeightMax": 93.0},
-    '105_M' : {"WeightClass": "105", "Sex" : 'M', "Equip": "raw", "Tested": "tested",  "WeightMin": 93.0, "WeightMax": 105.0},
-    '120_M' : {"WeightClass": "120", "Sex" : 'M', "Equip": "raw", "Tested": "tested",  "WeightMin": 105.0, "WeightMax": 120.0},
-    '120+_M' : {"WeightClass": "120+", "Sex" : 'M', "Equip": "raw", "Tested": "tested",  "WeightMin": 120.0, "WeightMax": 999.0},
-    '43_F' : {"WeightClass": "43", "Sex" : 'F', "Equip": "raw", "Tested": "tested",  "WeightMin": 0.0, "WeightMax": 43.0},
-    '47_F' : {"WeightClass": "47", "Sex" : 'F', "Equip": "raw", "Tested": "tested",  "WeightMin": 43.0, "WeightMax": 47.0},
-    '52_F' : {"WeightClass": "52", "Sex" : 'F', "Equip": "raw", "Tested": "tested",  "WeightMin": 47.0, "WeightMax": 52.0},
-    '57_F' : {"WeightClass": "57", "Sex" : 'F', "Equip": "raw", "Tested": "tested",  "WeightMin": 52.0, "WeightMax": 57.0},
-    '63_F' : {"WeightClass": "63", "Sex" : 'F', "Equip": "raw", "Tested": "tested",  "WeightMin": 57.0, "WeightMax": 63.0},
-    '72_F' : {"WeightClass": "72", "Sex" : 'F', "Equip": "raw", "Tested": "tested",  "WeightMin": 63.0, "WeightMax": 72.0},
-    '84_F' : {"WeightClass": "84", "Sex" : 'F', "Equip": "raw", "Tested": "tested",  "WeightMin": 72.0, "WeightMax": 84.0},
-    '84+_F' : {"WeightClass": "84+", "Sex" : 'F', "Equip": "raw", "Tested": "tested",  "WeightMin": 84.0, "WeightMax": 999.0},
+    '53_M' : {"WeightClass": "53", "Sex" : 'M', "Equip": "Raw", "Tested": "tested", "WeightMin": 0.0, "WeightMax": 53.0},
+    '59_M' : {"WeightClass": "59", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 53.0, "WeightMax": 59.0},
+    '66_M' : {"WeightClass": "66", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 59.0, "WeightMax": 66.0},
+    '74_M' : {"WeightClass": "74", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 66.0, "WeightMax": 74.0},
+    '83_M' : {"WeightClass": "83", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 74.0, "WeightMax": 83.0},
+    '93_M' : {"WeightClass": "93", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 83.0, "WeightMax": 93.0},
+    '105_M' : {"WeightClass": "105", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 93.0, "WeightMax": 105.0},
+    '120_M' : {"WeightClass": "120", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 105.0, "WeightMax": 120.0},
+    '120+_M' : {"WeightClass": "120+", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 120.0, "WeightMax": 999.0},
+    '43_F' : {"WeightClass": "43", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 0.0, "WeightMax": 43.0},
+    '47_F' : {"WeightClass": "47", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 43.0, "WeightMax": 47.0},
+    '52_F' : {"WeightClass": "52", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 47.0, "WeightMax": 52.0},
+    '57_F' : {"WeightClass": "57", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 52.0, "WeightMax": 57.0},
+    '63_F' : {"WeightClass": "63", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 57.0, "WeightMax": 63.0},
+    '69_F' : {"WeightClass": "69", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 63.0, "WeightMax": 69.0},
+    '76_F' : {"WeightClass": "76", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 69.0, "WeightMax": 76.0},
+    '84_F' : {"WeightClass": "84", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 76.0, "WeightMax": 84.0},
+    '84+_F' : {"WeightClass": "84+", "Sex" : 'F', "Equip": "Raw", "Tested": "tested",  "WeightMin": 84.0, "WeightMax": 999.0},
 }
 
 weight_class_dict_untested = {
-    '52_M' : {"WeightClass": "52", "Sex" : 'M', "Equip": "raw", "Tested": "untested", "WeightMin": 0.0, "WeightMax": 52.0},
-    '56_M' : {"WeightClass": "56", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 52.0, "WeightMax": 56.0},
-    '60_M' : {"WeightClass": "60", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 56.0, "WeightMax": 60.0},
-    '67.5_M' : {"WeightClass": "67.5", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 60.0, "WeightMax": 67.5},
-    '75_M' : {"WeightClass": "75", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 67.5, "WeightMax": 75.0},
-    '82.5_M' : {"WeightClass": "82.5", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 75.0, "WeightMax": 82.5},
-    '90_M' : {"WeightClass": "90", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 82.5, "WeightMax": 90.0},
-    '100_M' : {"WeightClass": "100", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 90.0, "WeightMax": 100.0},
-    '110_M' : {"WeightClass": "110", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 100.0, "WeightMax": 110.0},
-    '125_M' : {"WeightClass": "125", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 110.0, "WeightMax": 125.0},
-    '140_M' : {"WeightClass": "140", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 125.0, "WeightMax": 140.0},
-    '140+_M' : {"WeightClass": "140+", "Sex" : 'M', "Equip": "raw", "Tested": "untested",  "WeightMin": 140.0, "WeightMax": 999.0},
-    '44_F' : {"WeightClass": "44", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 0.0, "WeightMax": 44.0},
-    '48_F' : {"WeightClass": "48", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 44.0, "WeightMax": 48.0},
-    '52_F' : {"WeightClass": "52", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 48.0, "WeightMax": 52.0},
-    '56_F' : {"WeightClass": "56", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 52.0, "WeightMax": 56.0},
-    '60_F' : {"WeightClass": "60", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 56.0, "WeightMax": 60.0},
-    '67.5_F' : {"WeightClass": "67.5", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 60.0, "WeightMax": 67.5},
-    '75_F' : {"WeightClass": "75", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 67.5, "WeightMax": 75.0},
-    '82.5_F' : {"WeightClass": "82.5", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 75.0, "WeightMax": 82.5},
-    '90_F' : {"WeightClass": "90", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 82.5, "WeightMax": 90.0},
-    '90+_F' : {"WeightClass": "90+", "Sex" : 'F', "Equip": "raw", "Tested": "untested",  "WeightMin": 90.0, "WeightMax": 999.0},
+    '52_M' : {"WeightClass": "52", "Sex" : 'M', "Equip": "Raw", "Tested": "untested", "WeightMin": 0.0, "WeightMax": 52.0},
+    '56_M' : {"WeightClass": "56", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 52.0, "WeightMax": 56.0},
+    '60_M' : {"WeightClass": "60", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 56.0, "WeightMax": 60.0},
+    '67.5_M' : {"WeightClass": "67.5", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 60.0, "WeightMax": 67.5},
+    '75_M' : {"WeightClass": "75", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 67.5, "WeightMax": 75.0},
+    '82.5_M' : {"WeightClass": "82.5", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 75.0, "WeightMax": 82.5},
+    '90_M' : {"WeightClass": "90", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 82.5, "WeightMax": 90.0},
+    '100_M' : {"WeightClass": "100", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 90.0, "WeightMax": 100.0},
+    '110_M' : {"WeightClass": "110", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 100.0, "WeightMax": 110.0},
+    '125_M' : {"WeightClass": "125", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 110.0, "WeightMax": 125.0},
+    '140_M' : {"WeightClass": "140", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 125.0, "WeightMax": 140.0},
+    '140+_M' : {"WeightClass": "140+", "Sex" : 'M', "Equip": "Raw", "Tested": "untested",  "WeightMin": 140.0, "WeightMax": 999.0},
+    '44_F' : {"WeightClass": "44", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 0.0, "WeightMax": 44.0},
+    '48_F' : {"WeightClass": "48", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 44.0, "WeightMax": 48.0},
+    '52_F' : {"WeightClass": "52", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 48.0, "WeightMax": 52.0},
+    '56_F' : {"WeightClass": "56", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 52.0, "WeightMax": 56.0},
+    '60_F' : {"WeightClass": "60", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 56.0, "WeightMax": 60.0},
+    '67.5_F' : {"WeightClass": "67.5", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 60.0, "WeightMax": 67.5},
+    '75_F' : {"WeightClass": "75", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 67.5, "WeightMax": 75.0},
+    '82.5_F' : {"WeightClass": "82.5", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 75.0, "WeightMax": 82.5},
+    '90_F' : {"WeightClass": "90", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 82.5, "WeightMax": 90.0},
+    '90+_F' : {"WeightClass": "90+", "Sex" : 'F', "Equip": "Raw", "Tested": "untested",  "WeightMin": 90.0, "WeightMax": 999.0},
+}
+
+weight_class_dict_untested_wraps = {
+    'W52_M' : {"WeightClass": "52", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested", "WeightMin": 0.0, "WeightMax": 52.0},
+    'W56_M' : {"WeightClass": "56", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 52.0, "WeightMax": 56.0},
+    'W60_M' : {"WeightClass": "60", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 56.0, "WeightMax": 60.0},
+    'W67.5_M' : {"WeightClass": "67.5", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 60.0, "WeightMax": 67.5},
+    'W75_M' : {"WeightClass": "75", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 67.5, "WeightMax": 75.0},
+    'W82.5_M' : {"WeightClass": "82.5", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 75.0, "WeightMax": 82.5},
+    'W90_M' : {"WeightClass": "90", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 82.5, "WeightMax": 90.0},
+    'W100_M' : {"WeightClass": "100", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 90.0, "WeightMax": 100.0},
+    'W110_M' : {"WeightClass": "110", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 100.0, "WeightMax": 110.0},
+    'W125_M' : {"WeightClass": "125", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 110.0, "WeightMax": 125.0},
+    'W140_M' : {"WeightClass": "140", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 125.0, "WeightMax": 140.0},
+    'W140+_M' : {"WeightClass": "140+", "Sex" : 'M', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 140.0, "WeightMax": 999.0},
+    'W44_F' : {"WeightClass": "44", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 0.0, "WeightMax": 44.0},
+    'W48_F' : {"WeightClass": "48", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 44.0, "WeightMax": 48.0},
+    'W52_F' : {"WeightClass": "52", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 48.0, "WeightMax": 52.0},
+    'W56_F' : {"WeightClass": "56", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 52.0, "WeightMax": 56.0},
+    'W60_F' : {"WeightClass": "60", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 56.0, "WeightMax": 60.0},
+    'W67.5_F' : {"WeightClass": "67.5", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 60.0, "WeightMax": 67.5},
+    'W75_F' : {"WeightClass": "75", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 67.5, "WeightMax": 75.0},
+    'W82.5_F' : {"WeightClass": "82.5", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 75.0, "WeightMax": 82.5},
+    'W90_F' : {"WeightClass": "90", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 82.5, "WeightMax": 90.0},
+    'W90+_F' : {"WeightClass": "90+", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 90.0, "WeightMax": 999.0},
 }
 
 youth_divisions = [
@@ -81,10 +107,15 @@ lift_label_lookup = {
             }
 
 def generate_tables():
+
+    # Download information and unzip
+
+
     tested_data_csv = "openipf-2022-03-22-4758fd85.csv"
     untested_data_csv = "openpowerlifting-2022-03-22-4758fd85.csv"    
-    generate_tables_per_file(tested_data_csv, weight_class_dict)
+    generate_tables_per_file(untested_data_csv, weight_class_dict_untested_wraps)
     generate_tables_per_file(untested_data_csv, weight_class_dict_untested)
+    generate_tables_per_file(tested_data_csv, weight_class_dict)
 
 def generate_tables_per_file(csv_file, weight_classes):
 
@@ -112,24 +143,56 @@ def generate_tables_per_file(csv_file, weight_classes):
                 'TotalKg': ['SBD']
             }
 
-            filter_event = filter_event_dict[filter_lift]
+            filter_equipment_dict = {
+                'Best3SquatKg':  [weight_class_full_data['Equip']],
+                'Best3BenchKg': ['Raw', 'Wraps'],
+                'Best3DeadliftKg': ['Raw', 'Wraps'],
+                'TotalKg':  [weight_class_full_data['Equip']]
+            }
 
+            # ----Current
+            # Untested Sleeves
+            # SQ - Sleeves, SDB
+            # BP - Sleeves, SDB BD B
+            # DL - Sleeves, SBD BD D
+            # TL - Sleeves, SBD
+
+            # Untested Wraps
+            # SQ - Wraps, SDB
+            # BP - Wraps, SDB 
+            # DL - Wraps, SBD 
+            # TL - Wraps, SBD
+
+            # ------ Ideal
+            # Untested Sleeves
+            # SQ - Sleeves, SDB
+            # BP - Raw + Wraps, SDB BD B
+            # DL - Raw + Wraps, SBD BD D
+            # TL - Sleeves, SBD
+
+            # Untested Wraps
+            # SQ - Wraps, SDB
+            # BP - Raw + Wraps, SDB BD B
+            # DL - Raw + Wraps, SBD BD D
+            # TL - Wraps, SBD
+
+            filter_event = filter_event_dict[filter_lift]
+            filter_equipment = filter_equipment_dict[filter_lift]
             res = []
 
-            filtered_df = df[(df['Equipment'] == 'Raw')  
+            filtered_df = df[(df['Event'].isin(filter_event))
+                        & (df['Equipment'].isin(filter_equipment))  
                         & (df['BodyweightKg'] > weight_class_full_data['WeightMin']) 
                         & (df['BodyweightKg'] <= weight_class_full_data['WeightMax'])  
-                        & (df['Equipment'] == 'Raw')  
-                        & (df['Sex'] == weight_class_full_data['Sex'])
-                        & (df['Event'].isin(filter_event))
-                        #& (~df['Division'].isin(youth_divisions))    
+                        & (df['Sex'] == weight_class_full_data['Sex']) 
+                        & (df['Place'] != 'DQ') 
+                        & (~df['Division'].isin(youth_divisions))  
                         & (np.isnan(df[filter_lift]) == False)]
 
             #print(len(filtered_df))
             selection = filtered_df.loc[:,['Name','BodyweightKg', 'Event', filter_lift, 'Age']]
 
             # Need to get the best total for each Name
-
 
             sorted_df = selection.sort_values(filter_lift, ascending=False).drop_duplicates(['Name'])
             entry_size = len(sorted_df)
@@ -148,9 +211,9 @@ def generate_tables_per_file(csv_file, weight_classes):
                 
                 # full detail or shortened details
                 if generate_full_details:
-                    res.append([percentile, entry[filter_lift], entry['Name'], entry_size - int(percentile/100*entry_size)])
+                    res.append([percentile, entry[filter_lift], entry_size - int(percentile/100*entry_size), entry['Name']])
                 else:
-                    res.append([percentile, entry[filter_lift]])
+                    res.append([percentile, entry[filter_lift], entry_size - int(percentile/100*entry_size)])
 
 
             class_percentiles[lift_label_lookup[filter_lift]] = res
@@ -163,12 +226,12 @@ def generate_tables_per_file(csv_file, weight_classes):
         #     outfile.write(json.dumps(class_percentiles))
 
         # output to one file (read in current and then add to dict and append to file)
-        with open('all_data') as file:
+        with open('all_data.json') as file:
             cur_percentile_data = json.load(file)
 
         cur_percentile_data[weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip']] = class_percentiles   
 
-        with open('all_data', "w") as outfile:
+        with open('all_data.json', "w") as outfile:
             outfile.write(json.dumps(cur_percentile_data))
     
     pass
@@ -191,7 +254,7 @@ def calc_percentile(weight_class_full_data, filter_lift_input, target_lift, ):
     # with open('data/' + input_file_name) as file:
     #     percentile_data = json.load(file)
 
-    with open('all_data') as file:
+    with open('all_data.json') as file:
             all_percentile_data = json.load(file)
 
     for data in (all_percentile_data[class_dict_key][lift_label_lookup[filter_lift_input]]):
@@ -225,7 +288,7 @@ def show_class():
         weight_class_full_data = weight_class_dict[weight_class]
 
     
-    with open('all_data') as file:
+    with open('all_data.json') as file:
         all_percentile_data = json.load(file)
 
     class_dict_key = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] + weight_class_full_data['Equip']
@@ -254,6 +317,7 @@ def main():
         generate_tables()    
         e_time = time.time()
         print("Generating the datatables took: ", (e_time-s_time), "seconds")
+        exit()
 
     main_menu = TerminalMenu(['Start', "Exit"], title = "-------------------")
     main_menu_index = None
