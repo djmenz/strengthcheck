@@ -11,6 +11,8 @@ from simple_term_menu import TerminalMenu, main
 generate_new_percentile_tables = False
 generate_full_details = False
 
+output_file = 'all_data.json'
+
 weight_class_dict = {
     '53_M' : {"WeightClass": "53", "Sex" : 'M', "Equip": "Raw", "Tested": "tested", "WeightMin": 0.0, "WeightMax": 53.0},
     '59_M' : {"WeightClass": "59", "Sex" : 'M', "Equip": "Raw", "Tested": "tested",  "WeightMin": 53.0, "WeightMax": 59.0},
@@ -112,7 +114,13 @@ def generate_tables():
 
 
     tested_data_csv = "openipf-2022-03-22-4758fd85.csv"
-    untested_data_csv = "openpowerlifting-2022-03-22-4758fd85.csv"    
+    untested_data_csv = "openpowerlifting-2022-03-22-4758fd85.csv"
+
+    # Create empty results file if it doesn't exist
+    if not os.path.exists('all_data1.json'):
+        with open('output_file', "w+") as outfile:
+            outfile.write(json.dumps({}))
+
     generate_tables_per_file(untested_data_csv, weight_class_dict_untested_wraps)
     generate_tables_per_file(untested_data_csv, weight_class_dict_untested)
     generate_tables_per_file(tested_data_csv, weight_class_dict)
@@ -193,14 +201,12 @@ def generate_tables_per_file(csv_file, weight_classes):
             selection = filtered_df.loc[:,['Name','BodyweightKg', 'Event', filter_lift, 'Age']]
 
             # Need to get the best total for each Name
-
             sorted_df = selection.sort_values(filter_lift, ascending=False).drop_duplicates(['Name'])
             entry_size = len(sorted_df)
             print(f"{entry_size} entries in selected class") # Number of entries in that category, not name disambiguated
             print(filter_lift)
             print(weight_class_full_data['WeightClass'])
 
-            # percentiles = [100, 90, 80, 70, 60, 50 ,40 ,30 ,20, 10]
 
             percentiles = [i for i in range(100,0, -1)]
 
@@ -219,29 +225,19 @@ def generate_tables_per_file(csv_file, weight_classes):
             class_percentiles[lift_label_lookup[filter_lift]] = res
             print()
 
-        # Output to file
-        # output_file_name = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip'] \
-        #                  + '_percentiles.json'
-        # with open('data/' + output_file_name, "w") as outfile:
-        #     outfile.write(json.dumps(class_percentiles))
 
         # output to one file (read in current and then add to dict and append to file)
-        with open('all_data.json') as file:
+        with open('output_file', 'r') as file:
             cur_percentile_data = json.load(file)
 
         cur_percentile_data[weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip']] = class_percentiles   
 
-        with open('all_data.json', "w") as outfile:
+        with open('output_file', "w") as outfile:
             outfile.write(json.dumps(cur_percentile_data))
     
     pass
 
-# data
-#print(df.sample(50))
-#print(df.columns.tolist())
-#print(len(df))
-#me = df[df['Name'] == 'Daniel Menz']
-#print(me)
+
 
 def calc_percentile(weight_class_full_data, filter_lift_input, target_lift, ):
    
@@ -251,10 +247,7 @@ def calc_percentile(weight_class_full_data, filter_lift_input, target_lift, ):
 
     class_dict_key = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] + weight_class_full_data['Equip']
     
-    # with open('data/' + input_file_name) as file:
-    #     percentile_data = json.load(file)
-
-    with open('all_data.json') as file:
+    with open('output_file') as file:
             all_percentile_data = json.load(file)
 
     for data in (all_percentile_data[class_dict_key][lift_label_lookup[filter_lift_input]]):
@@ -288,7 +281,7 @@ def show_class():
         weight_class_full_data = weight_class_dict[weight_class]
 
     
-    with open('all_data.json') as file:
+    with open('output_file') as file:
         all_percentile_data = json.load(file)
 
     class_dict_key = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] + weight_class_full_data['Equip']
@@ -296,7 +289,6 @@ def show_class():
     for i in range(0,100):
         temp = ""
         for k,v in (all_percentile_data[class_dict_key]).items():
-            #breakpoint()
             temp +=f"{k} {v[i][1]:6} | " 
         print(f"{100-i:3}%  {temp}")
 
@@ -334,11 +326,6 @@ def main():
         
         if main_menu_index == 0:
             os.system('clear')
-            # weight_classes = ['59','66','74','83','93','105','120','120+','----','43','47','52','57','63','72','84','84+', '-----',
-            # '52','56','60','67.5','75','82.5','90','100','110','125','140','140+', '-----',
-            # '44','48','52','56','60','67.5','75','82.5','90','90+']
-
-            # weight_classes_all = list(weight_class_dict.keys()) + list(weight_class_dict_untested.keys())
             
             gender_menu = TerminalMenu(['Male', "Female"])
             gender_selection_index = gender_menu.show()
@@ -380,7 +367,7 @@ def main():
             print(target_weight)
             calc_percentile(weight_class_full, lift_selection, target_weight)
             
-            
+        
     exit()
 
 
