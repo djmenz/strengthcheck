@@ -112,7 +112,7 @@ def generate_tables():
 
     # Download information and unzip
     tested_data_csv = "openipf-latest.csv"
-    untested_data_csv = " openpowerlifting-latest.csv"
+    untested_data_csv = "openpowerlifting-latest.csv"
 
     # Create empty results file if it doesn't exist
     if not os.path.exists('all_data1.json'):
