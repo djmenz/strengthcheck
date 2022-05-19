@@ -2,6 +2,7 @@ import os
 from ftplib import parse150
 import pandas as pd
 import numpy as np
+import math
 import time
 import json
 import sys
@@ -84,21 +85,27 @@ weight_class_dict_untested_wraps = {
     'W90+_F' : {"WeightClass": "90+", "Sex" : 'F', "Equip": "Wraps", "Tested": "untested",  "WeightMin": 90.0, "WeightMax": 999.0},
 }
 
+age_divisions_dict = {
+'AA': [],
+'T1': ['13-15'],
+'T2': ['16-17','18-19'],
+'J1': ['20-23'],
+'O1': ['24-34','35-39'],
+'M1': ['40-44', '45-49', '50-54', '55-59'],
+'M2': ['60-64', '65-69', '70-74', '75-79','80-999']
+}
+
 youth_divisions = [
-        'MR-T1',
-        'MR-T2',
-        'MR-T3',
+        'MR-T1', #14-15
         'MR-Y1',
         'MR-Y2',
         'MR-Y3',
         'FR-T1',
-        'FR-T2',
-        'FR-T3',
         'FR-Y1',
         'FR-Y2',
         'FR-Y3',
         'Sub-Juniors',
-        'Teen',
+        #'Teen',
         ]
 
 lift_label_lookup = {
@@ -116,7 +123,7 @@ def generate_tables():
 
     # Create empty results file if it doesn't exist
     if not os.path.exists('all_data1.json'):
-        with open('output_file', "w+") as outfile:
+        with open(output_file, "w+") as outfile:
             outfile.write(json.dumps({}))
 
     generate_tables_per_file(untested_data_csv, weight_class_dict_untested_wraps)
@@ -131,108 +138,134 @@ def generate_tables_per_file(csv_file, weight_classes):
     df = pd.read_csv(csv_file)
     e_time = time.time()
     print("Read without chunks: ", (e_time-s_time), "seconds")
+
+    total_entries = 0
     
     for weight_class_full_data in weight_classes.values():
-                
-        class_percentiles = {
-            "Squat" : {},
-            "Bench" : {},
-            "Deadlift": {},
-            "Total": {}
-        }
-
-        for filter_lift in ['Best3SquatKg', 'Best3BenchKg', 'Best3DeadliftKg', 'TotalKg']:
-            filter_event_dict = {
-                'Best3SquatKg': ['SBD'],
-                'Best3BenchKg': ['B','BD','SBD'],
-                'Best3DeadliftKg': ['D','BD','SBD'],
-                'TotalKg': ['SBD']
+        for weight_class_age in age_divisions_dict.keys():
+                    
+            class_percentiles = {
+                "Squat" : {},
+                "Bench" : {},
+                "Deadlift": {},
+                "Total": {}
             }
 
-            filter_equipment_dict = {
-                'Best3SquatKg':  [weight_class_full_data['Equip']],
-                'Best3BenchKg': ['Raw', 'Wraps'],
-                'Best3DeadliftKg': ['Raw', 'Wraps'],
-                'TotalKg':  [weight_class_full_data['Equip']]
-            }
+            for filter_lift in ['Best3SquatKg', 'Best3BenchKg', 'Best3DeadliftKg', 'TotalKg']:
+                filter_event_dict = {
+                    'Best3SquatKg': ['SBD'],
+                    'Best3BenchKg': ['B','BD','SBD'],
+                    'Best3DeadliftKg': ['D','BD','SBD'],
+                    'TotalKg': ['SBD']
+                }
 
-            # ----Current
-            # Untested Sleeves
-            # SQ - Sleeves, SDB
-            # BP - Sleeves, SDB BD B
-            # DL - Sleeves, SBD BD D
-            # TL - Sleeves, SBD
-
-            # Untested Wraps
-            # SQ - Wraps, SDB
-            # BP - Wraps, SDB 
-            # DL - Wraps, SBD 
-            # TL - Wraps, SBD
-
-            # ------ Ideal
-            # Untested Sleeves
-            # SQ - Sleeves, SDB
-            # BP - Raw + Wraps, SDB BD B
-            # DL - Raw + Wraps, SBD BD D
-            # TL - Sleeves, SBD
-
-            # Untested Wraps
-            # SQ - Wraps, SDB
-            # BP - Raw + Wraps, SDB BD B
-            # DL - Raw + Wraps, SBD BD D
-            # TL - Wraps, SBD
-
-            filter_event = filter_event_dict[filter_lift]
-            filter_equipment = filter_equipment_dict[filter_lift]
-            res = []
-
-            filtered_df = df[(df['Event'].isin(filter_event))
-                        & (df['Equipment'].isin(filter_equipment))  
-                        & (df['BodyweightKg'] > weight_class_full_data['WeightMin']) 
-                        & (df['BodyweightKg'] <= weight_class_full_data['WeightMax'])  
-                        & (df['Sex'] == weight_class_full_data['Sex']) 
-                        & (df['Place'] != 'DQ') 
-                        & (~df['Division'].isin(youth_divisions))  
-                        & (np.isnan(df[filter_lift]) == False)]
-
-            #print(len(filtered_df))
-            selection = filtered_df.loc[:,['Name','BodyweightKg', 'Event', filter_lift, 'Age']]
-
-            # Need to get the best total for each Name
-            sorted_df = selection.sort_values(filter_lift, ascending=False).drop_duplicates(['Name'])
-            entry_size = len(sorted_df)
-            print(f"{entry_size} entries in selected class") # Number of entries in that category, not name disambiguated
-            print(filter_lift)
-            print(weight_class_full_data['WeightClass'])
-
-
-            percentiles = [i for i in range(100,0, -1)]
-
-            for percentile in percentiles:
-                location = int(entry_size * (1 - (percentile / 100)))
-                entry = (sorted_df.iloc[location,:])
-                #print(f"{percentile} - {entry[filter_lift]} - {entry['Name']} - {entry_size - int(percentile/100*entry_size)}")
+                filter_equipment_dict = {
+                    'Best3SquatKg':  [weight_class_full_data['Equip']],
+                    'Best3BenchKg': ['Raw', 'Wraps'],
+                    'Best3DeadliftKg': ['Raw', 'Wraps'],
+                    'TotalKg':  [weight_class_full_data['Equip']]
+                }
                 
-                # full detail or shortened details
-                if generate_full_details:
-                    res.append([percentile, entry[filter_lift], entry_size - int(percentile/100*entry_size), entry['Name']])
+
+                # ----Current
+                # Untested Sleeves
+                # SQ - Sleeves, SDB
+                # BP - Sleeves, SDB BD B
+                # DL - Sleeves, SBD BD D
+                # TL - Sleeves, SBD
+
+                # Untested Wraps
+                # SQ - Wraps, SDB
+                # BP - Wraps, SDB 
+                # DL - Wraps, SBD 
+                # TL - Wraps, SBD
+
+                # ------ Ideal
+                # Untested Sleeves
+                # SQ - Sleeves, SDB
+                # BP - Raw + Wraps, SDB BD B
+                # DL - Raw + Wraps, SBD BD D
+                # TL - Sleeves, SBD
+
+                # Untested Wraps
+                # SQ - Wraps, SDB
+                # BP - Raw + Wraps, SDB BD B
+                # DL - Raw + Wraps, SBD BD D
+                # TL - Wraps, SBD
+
+                filter_event = filter_event_dict[filter_lift]
+                filter_equipment = filter_equipment_dict[filter_lift]
+                res = []
+                filter_weight_classes = age_divisions_dict[weight_class_age]
+
+                if weight_class_age == 'AA':
+                    filtered_df = df[(df['Event'].isin(filter_event))
+                                & (df['Equipment'].isin(filter_equipment)) 
+                                & (df['BodyweightKg'] > weight_class_full_data['WeightMin']) 
+                                & (df['BodyweightKg'] <= weight_class_full_data['WeightMax'])  
+                                & (df['Sex'] == weight_class_full_data['Sex']) 
+                                & (df['Place'] != 'DQ')
+                                & (~df['Division'].isin(youth_divisions))  
+                                & (np.isnan(df[filter_lift]) == False)]
                 else:
-                    res.append([percentile, entry[filter_lift], entry_size - int(percentile/100*entry_size)])
+                    filtered_df = df[(df['Event'].isin(filter_event))
+                                & (df['Equipment'].isin(filter_equipment))
+                                #& (df['BirthYearClass'].isin(junior_ipf))                         
+                                & (df['AgeClass'].isin(filter_weight_classes))  
+                                & (df['BodyweightKg'] > weight_class_full_data['WeightMin']) 
+                                & (df['BodyweightKg'] <= weight_class_full_data['WeightMax'])  
+                                & (df['Sex'] == weight_class_full_data['Sex']) 
+                                & (df['Place'] != 'DQ')
+                                & (np.isnan(df[filter_lift]) == False)]
+
+                #print(len(filtered_df))
+
+                #filter out nan ageclasses
+                # filtered_df = filtered_df1[df['AgeClass'].notnull()]
+
+                selection = filtered_df.loc[:,['Name','BodyweightKg', 'Event', filter_lift, 'AgeClass', 'BirthYearClass', 'Age']]
+
+                # Need to get the best total for each Name
+                sorted_df = selection.sort_values(filter_lift, ascending=False).drop_duplicates(['Name'])
+                entry_size = len(sorted_df)
+                print(f"{entry_size} entries in selected class") # Number of entries in that category, not name disambiguated
+                total_entries += entry_size
+                print(filter_lift)
+                print(weight_class_full_data['WeightClass'])
 
 
-            class_percentiles[lift_label_lookup[filter_lift]] = res
-            print()
+                percentiles = [i for i in range(100,0, -1)]
+
+                # import pdb; pdb.set_trace()
+                for percentile in percentiles:
+                    location = int(entry_size * (1 - (percentile / 100)))
+                    entry = (sorted_df.iloc[location,:])
+                    # print(entry['Age'])
+                    print(f"{entry['AgeClass']} {entry['BirthYearClass']}")
+
+                    #print(f"{percentile} - {entry[filter_lift]} - {entry['Name']} - {entry_size - int(percentile/100*entry_size)}")
+                    
+                    # full detail or shortened details
+                    if generate_full_details:
+                        res.append([percentile, entry[filter_lift], entry_size - int(percentile/100*entry_size), entry['Name']])
+                    else:
+                        res.append([percentile, entry[filter_lift], entry_size - int(percentile/100*entry_size)])
 
 
-        # output to one file (read in current and then add to dict and append to file)
-        with open('output_file', 'r') as file:
-            cur_percentile_data = json.load(file)
+                class_percentiles[lift_label_lookup[filter_lift]] = res
+                print()
 
-        cur_percentile_data[weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip']] = class_percentiles   
 
-        with open('output_file', "w") as outfile:
-            outfile.write(json.dumps(cur_percentile_data))
-    
+            # output to one file (read in current and then add to dict and append to file)
+            with open(output_file, 'r') as file:
+                cur_percentile_data = json.load(file)
+
+            cur_percentile_data[weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip']+ weight_class_age] = class_percentiles   
+
+            with open(output_file, "w") as outfile:
+                outfile.write(json.dumps(cur_percentile_data))
+        
+    print(f"total_entries: {total_entries}")
     pass
 
 
@@ -245,7 +278,7 @@ def calc_percentile(weight_class_full_data, filter_lift_input, target_lift, ):
 
     class_dict_key = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] + weight_class_full_data['Equip']
     
-    with open('output_file') as file:
+    with open(output_file) as file:
             all_percentile_data = json.load(file)
 
     for data in (all_percentile_data[class_dict_key][lift_label_lookup[filter_lift_input]]):
@@ -279,7 +312,7 @@ def show_class():
         weight_class_full_data = weight_class_dict[weight_class]
 
     
-    with open('output_file') as file:
+    with open(output_file) as file:
         all_percentile_data = json.load(file)
 
     class_dict_key = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] + weight_class_full_data['Equip']
