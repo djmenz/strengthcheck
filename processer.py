@@ -228,10 +228,12 @@ def generate_tables_per_file(csv_file, weight_classes):
                 # Need to get the best total for each Name
                 sorted_df = selection.sort_values(filter_lift, ascending=False).drop_duplicates(['Name'])
                 entry_size = len(sorted_df)
-                print(f"{entry_size} entries in selected class") # Number of entries in that category, not name disambiguated
+                print(f"{entry_size} entries in selected class") # Number of entries in that category
                 total_entries += entry_size
                 print(filter_lift)
                 print(weight_class_full_data['WeightClass'])
+                print(weight_class_full_data['Equip'])
+                print(weight_class_age)
 
 
                 percentiles = [i for i in range(100,0, -1)]
@@ -241,7 +243,7 @@ def generate_tables_per_file(csv_file, weight_classes):
                     location = int(entry_size * (1 - (percentile / 100)))
                     entry = (sorted_df.iloc[location,:])
                     # print(entry['Age'])
-                    print(f"{entry['AgeClass']} {entry['BirthYearClass']}")
+                    #print(f"{entry['AgeClass']} {entry['BirthYearClass']}")
 
                     #print(f"{percentile} - {entry[filter_lift]} - {entry['Name']} - {entry_size - int(percentile/100*entry_size)}")
                     
@@ -253,14 +255,19 @@ def generate_tables_per_file(csv_file, weight_classes):
 
 
                 class_percentiles[lift_label_lookup[filter_lift]] = res
-                print()
-
 
             # output to one file (read in current and then add to dict and append to file)
             with open(output_file, 'r') as file:
                 cur_percentile_data = json.load(file)
 
-            cur_percentile_data[weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip']+ weight_class_age] = class_percentiles   
+            class_code = weight_class_full_data['Sex'] + weight_class_full_data['WeightClass'] +weight_class_full_data['Equip']+ weight_class_age
+
+            cur_percentile_data[class_code] = class_percentiles
+
+            # This would overwrite for each of the lifts, but end up on the total number
+            if 'class_entries' not in cur_percentile_data:
+                cur_percentile_data['class_entries'] = {}
+            cur_percentile_data['class_entries'][class_code] = entry_size
 
             with open(output_file, "w") as outfile:
                 outfile.write(json.dumps(cur_percentile_data))
